@@ -1,0 +1,62 @@
+Artificial Intelligence
+Term Project 
+Term Project Grading & Evaluation Matrix (Total Marks: 30)
+
+15 Marks for Python Implementation and 15 Marks for individual Viva Performance.
+
+Group Members:
+Only 3-4 allowed.
+Deadline:
+11th June
+Limitation:
+No project can be repeated more than three times among groups.
+
+
+
+
+Project 1: The Dragon's Hoard (Subtractive Nim Variant)
+Target Algorithms: Minimax & Alpha-Beta Pruning 
+Scenario & Rules: Two players (the Treasure Hunter and the Dragon) take turns removing gold coins from a central hoard containing a starting number of coins (e.g., N = 15 to 21). On any given turn, a player can choose to steal exactly 1, 2, or 3 coins. This follows a Misère Play structure: the agent forced to take the very last coin awakens the dragon and loses (utility: -1), while the opponent wins (utility: +1).
+Thorough Explanation: The recursive functions use the remaining coin count as the integer state node. You will first implement standard Minimax to construct the game tree and determine the theoretical win/loss state from the root. Then must expand it to include Alpha-Beta parameters (alpha, beta) to actively prune unneeded branches when a player identifies an guaranteed path to victory or defeat.
+
+
+
+Project 2: The Haunted Bridge Crossing (Stochastic Nim)
+Target Algorithms: Expecti-Minimax 
+Scenario & Rules: Building directly on the subtractive game mechanics, two players compete to cross a bridge safely. There are N = 12 planks remaining. On a turn, a player can choose to advance safely by 1 plank (100% deterministic success rate) or leap forward by 2 planks. However, leaping introduces an environmental chance node: there is an 80% chance of landing perfectly on the 2nd plank, and a 20% chance of slipping and advancing only 1 plank. Normal Play setup applies: the player who steps on the final plank wins.
+Thorough Explanation: Alongside MAX and MIN evaluation blocks, you must implement a Chance Node logic loop. When a child node is a chance node, the value returned to the parent is calculated using the expected utility theorem: 
+
+This project explicitly tests whether students understand why traditional Alpha-Beta pruning cannot be natively executed across open-bounded probability splits without risking mathematical errors.
+
+
+Project 3: Micro Tic-Tac-Toe (3x3 Bounded Depth)
+Target Algorithms: Minimax & Alpha-Beta Pruning
+Scenario & Rules: A classic 3 x 3 Tic-Tac-Toe grid where Player 1 (MAX, 'X') plays against Player 2 (MIN, 'O'). To keep it easy and manageable for a short-term project, you are asked to model a version where the game is already halfway through (e.g., 4 moves have already been made on fixed, pre-determined starting squares), or restrict the maximum search depth to a maximum of 3 to 4 turns ahead using an evaluation heuristic (such as: Number of open 3-in-a-row lines for MAX minus Number of open 3-in-a-row lines for MIN).
+Thorough Explanation: Terminal states are checked via row, column, or diagonal completion. By tracking a node evaluation counter, you will visually demonstrate how Alpha-Beta Pruning significantly shrinks the number of states checked while returning the exact same root decision value as an exhaustive Minimax search.
+
+
+Project 4: Gold Miner's Ridge (1D Continuous Space)
+Target Algorithms: Greedy Hill Climbing 
+Scenario & Rules: An automated robotic gold mining drone is dropped onto a jagged 1D mountain range. The terrain's gold concentration density is defined by a mathematical objective function, such as f(x) = -(x - 7)^2 + 15 or a customized multi-peak quadratic equation bounded between an integer domain of [0, 50]. The drone starts at a randomly assigned coordinate x_start and can only move left (x - 1) or right (x + 1).
+Thorough Explanation: You must write an iterative while loop that evaluates the objective function at the current position versus its immediate neighbors. The agent adopts a "greedy" rule: it shifts immediately to whichever neighbor yields a strictly higher output. The search terminates as soon as both immediate neighbors yield a lower gold density than the current spot. You must explicitly demonstrate and analyze the classic pitfall of basic Hill Climbing—getting trapped on a Local Maximum instead of finding the global peak.
+
+
+Project 5: The Delivery Route Planner (4-City TSP Optimization)
+Target Algorithms: Genetic Algorithms (Permutation Schema) 
+Scenario & Rules: A logistics vehicle needs to deliver goods to 4 or 5 regional distribution centers (Cities: A, B, C, D) and return to the starting town, visiting each location exactly once. A static coordinate system or distance matrix defines the travel cost between city links. The goal is to discover the shortest path loop.
+Thorough Explanation: Since a naive binary chromosome could yield invalid paths (e.g., visiting City A three times and omitting City B), you will model paths directly as ordered lists (e.g., [A, C, D, B]). The Fitness Function is mapped inversely to path distance: Fitness = 1/Total Distance. You will write functions for:
+Tournament Selection: Choosing high-performing parents.
+Ordered Crossover (OX1): Combining path slices safely.
+Swap Mutation: Exchanging the positions of two random cities to preserve diversity and escape local optima.
+
+
+Project 6: Maximizing the Power Grid (Binary Space Functions)
+Target Algorithms: Genetic Algorithms (Binary Schema) 
+Scenario & Rules: An engineer wants to optimize the power output configuration of an eco-friendly grid station. The performance efficiency is governed by an integer setting x bounded within the domain [0, 31]. The underlying operational reward curve follows the quadratic mathematical equation f(x) = x^2 - 4x + 10.
+Thorough Explanation: The search variable x is encoded as a simple 5-bit binary string array (e.g., [1, 1, 1, 1, 1] translates mathematically to x=31). You will initialize a small generation population (e.g., 6 individuals) and guide them through evolutionary cycles: parsing bit arrays into integers, calculating their fitness using the function, running Roulette Wheel Selection, applying Single-Point Crossover, and executing Bit-Flip Mutations. You should track the generation counter to find how fast the group converges onto the global peak (x=31).
+
+
+Project 7: The Loot Box Dilemma (Adversarial Item Selection)
+Target Algorithms: Minimax vs. Random Chance (Expecti-Minimax)
+Scenario & Rules: A player stands before a mysterious multi-tier chest structure. The player (MAX) can choose to open Box Left or Box Right. Opening a box triggers an automated mechanical selector (MIN or Chance). If they select Box Left, an opposing mechanism triggers to give them the worst possible item value out of a static set ([2, 12]). If they choose Box Right, a chaotic roll occurs: a fair coin is flipped (50% heads, 50% tails) to reward them with either a rare gemstone (+10 points) or a worthless item (0 points).
+Thorough Explanation: You will program two distinct solvers for the exact same choice layout. The first treats the game under the strict assumption that an adversarial competitor controls all secondary splits (Minimax). The second models the secondary splits using environmental probabilities (Expecti-Minimax). This project highlights how changing the environment model radically shifts an AI's optimal choice vector from defensive risk-avoidance to calculated risk-taking.

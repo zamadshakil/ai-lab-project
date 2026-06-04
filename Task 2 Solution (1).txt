@@ -1,0 +1,33 @@
+def solve_sticks(n, is_maximizing):
+ # Terminal condition: no sticks left
+ # If it's maximizing player's turn and 0 sticks left,
+ # it means the previous move (by opponent) took the last stick.
+
+ if n <= 0:
+ return -1 if is_maximizing else 1
+
+ if is_maximizing:
+ best_score = -float('inf')
+ # Try taking 1 or 2 sticks
+ for move in [1, 2]:
+ if n - move >= 0:
+ score = solve_sticks(n - move, False)
+ best_score = max(best_score, score)
+ return best_score
+
+ else:
+
+ best_score = float('inf')
+ for move in [1, 2]:
+ if n - move >= 0:
+ score = solve_sticks(n - move, True)
+ best_score = min(best_score, score)
+ return best_score
+
+
+sticks = 7
+result = solve_sticks(sticks, True)
+if result == 1:
+ print("Player 1 (MAX) can win!")
+else:
+ print("Player 2 (MIN) wins with optimal play.")

@@ -1,0 +1,97 @@
+Lab 10: Adversarial Search - Alpha-Beta Pruning
+1. Lab Objectives
+Understand the inefficiency of pure Minimax search in deep game trees.
+Define Alpha-Beta Pruning: Identify how to reduce the number of nodes evaluated by the Minimax algorithm.
+Implement Alpha and Beta parameters: Track the best scores found so far for both MAX and MIN players.
+Code Pruning Logic: Integrate the condition (beta <= alpha) to 'prune' unnecessary branches.
+Compare Search Efficiency: Observe how pruning achieves the same optimal result as Minimax while visiting fewer nodes.
+2. Introduction
+In the previous lab, we implemented the Minimax algorithm, which serves as the brain for AI in competitive games. However, Minimax has a significant drawback: it evaluates every single branch of the game tree. For complex games like Chess, this is impossible because the number of states exceeds the atoms in the universe. Alpha-Beta Pruning is an optimization that allows us to find the exact same optimal move while ignoring (pruning) branches that cannot possibly change the final outcome.
+3. Theoretical Background
+Pruning involves 'cutting off' branches of the search tree. If a player knows an opponent can already force a score worse than a previously discovered option, they do not need to explore that branch further. It works by maintaining two values during the search: Alpha and Beta. These values represent the 'window' of scores that are still relevant to the players.
+3.1 Alpha and Beta Definitions
+Alpha (α): The best value that the Maximizer (MAX) can currently guarantee at the current node or any node above it. Starts at -∞.
+Beta (β): The best value that the Minimizer (MIN) can currently guarantee. Starts at +∞.
+3.2 The Logic of Pruning
+As the recursion goes deeper into the tree, it updates Alpha and Beta. If at any point the Maximizer sees that Alpha (the best they can do) becomes greater than or equal to Beta (the best the opponent will allow), the Maximizer stops looking at any further children of that node. This is because the opponent (MIN) at a higher level of the tree already has a better option and would never let the game reach this state.
+3.3 Key Rule
+If Beta ≤ Alpha, then Prune.
+4. Alpha-Beta Pseudocode
+function alphabeta(node, depth, alpha, beta, isMaximizingPlayer):    if depth == 0 or node is terminal:        return static value of node    if isMaximizingPlayer:        maxEval = -infinity        for each child in node:            eval = alphabeta(child, depth - 1, alpha, beta, False)            maxEval = max(maxEval, eval)            alpha = max(alpha, eval)            if beta <= alpha:                break # Prune the remaining branches        return maxEval    else:        minEval = +infinity        for each child in node:            eval = alphabeta(child, depth - 1, alpha, beta, True)            minEval = min(minEval, eval)            beta = min(beta, eval)            if beta <= alpha:                break # Prune the remaining branches        return minEval
+5. Practice Task: Optimized Sticks Game
+In Lab 9, you solved the 'Sticks Game' using standard Minimax. In this task, you will optimize that implementation using Alpha-Beta pruning to make the AI more efficient.
+Scenario Rules:
+The game starts with 7 sticks.
+Players take turns removing 1 or 2 sticks.
+The player forced to take the final stick wins (Misere play variant).
+Goal: Implement `alphabeta_sticks(n, alpha, beta, isMax)` to determine if Player 1 can win.
+Your Goal:
+Update your recursive logic from the last lab to include `alpha` and `beta` parameters. Ensure that you use the pruning condition (beta <= alpha) to skip unnecessary game states.
+
+Hint: Print the current (n, alpha, beta) at the start of each function call to see the "search window" narrowing as the game progresses.
+
+
+6. Practice Task Guide (alpha-beta pruning)
+To visualize the Alpha-Beta Pruning process for the Sticks Game (7 sticks), we can represent the game as a state tree where each node shows the number of sticks remaining. In this Misere Play version (last person to take the stick wins), the goal of Player 1 (MAX) is to reach a terminal state that results in a +1 (win).
+Tree Visualization: 7-Stick Alpha-Beta Search
+In this tree, MAX nodes try to maximize the score, and MIN nodes try to minimize it. Alpha-Beta pruning will "cut" branches once a player realizes they have a better option elsewhere.
+State Space Breakdown (Starting at 7 sticks)
+  Start at Root (7 sticks): MAX player needs to choose between taking 1 or 2 sticks.
+  Left Branch (6 sticks): The algorithm explores the "Take 1" branch first. It goes deep into the sub-tree until it finds that MIN can force a result. Let's say the best MAX can get here is +1.
+  Updating Alpha (α): The root now sets α  = 1. This means MAX is guaranteed at least a 1 from the left side.
+  Right Branch (5 sticks): Now MAX looks at "Take 2".
+  Pruning Event: If the MIN player at the "5 sticks" node finds a move that leads to a 0 or lower, the Beta (β) for that node becomes ≤ α (i.e., 0 ≤ 1).
+  The Cut: MAX at the root knows they already have a "1" guaranteed on the left. Since MIN will definitely pick the "0" on the right, MAX doesn't need to see any more moves from the "5 sticks" branch. The rest of that branch is pruned.
+How Pruning Occurs (Example Walkthrough)
+When the algorithm explores the "Take 1" (6 sticks) branch first:
+It finds that if MIN plays optimally, the best MAX can get from this branch is, let's say, 1 (a win).
+The Alpha (α) value at the root becomes 1.
+Next, it starts exploring the "Take 2" (5 sticks) branch.
+If, while exploring the sub-branches of 5 sticks, the Beta (β) value for the MIN player drops to 1 or lower, the MAX player at the root knows they already have a guaranteed "1" in the first branch.
+Pruning: The algorithm stops looking at any other moves from the 5 sticks node because it cannot possibly be better than the first branch already found.
+Text-Based Logic Tree (Pruned)
+Here is how the search path looks in your Python implementation:
+7 Sticks (MAX) [α=-∞, β=+∞]
+├── 6 Sticks (MIN) [α=-∞, β=+∞]
+│   ├── 5 Sticks (MAX) ... -> returns 1
+│   └── 4 Sticks (MAX) ... -> returns 1
+│   └── (MIN picks best for them: 1) -> Root Alpha updated to 1
+│
+└── 5 Sticks (MIN) [α=1, β=+∞] 
+    ├── 4 Sticks (MAX) -> returns 1
+    └── [PRUNED] (Since MAX already has a 1, no need to check other moves for MIN)
+
+Text-Based Comparison (Minimax vs. Alpha-Beta)
+Feature
+Standard Minimax
+Alpha-Beta Pruning
+Nodes Visited
+~25 nodes (Full tree)
+~12-15 nodes (Optimized)
+Result at Root
+Player 1 Wins (+1)
+Player 1 Wins (+1)
+Search Logic
+Exhaustive
+Selective (ignores bad branches)
+
+
+Key Observations for your Lab
+Efficiency: In a standard Minimax search for 7 sticks, the AI might evaluate over 20-30 states. With Alpha-Beta, it skips several "losing" branches, often reducing the nodes visited by 30-50%.
+Decision: Even though branches are pruned, the root decision (whether to take 1 or 2 sticks) remains identical to the standard Minimax.
+
+
+
+
+
+
+
+
+
+
+
+
+7. Practice Task Code
+
+import mathdef solve_sticks_ab(n, alpha, beta, is_max):    # Base Case: Last stick remains    if n <= 1:        return 1 if is_max else -1    if is_max:        best = -math.inf        for move in [1, 2]:            if n - move >= 0:                res = solve_sticks_ab(n - move, alpha, beta, False)                best = max(best, res)                alpha = max(alpha, best)                if beta <= alpha:                    break        return best    else:        best = math.inf        for move in [1, 2]:            if n - move >= 0:                res = solve_sticks_ab(n - move, alpha, beta, True)                best = min(best, res)                beta = min(beta, best)                if beta <= alpha:                    break        return best# Testing with 7 sticksresult = solve_sticks_ab(7, -math.inf, math.inf, True)print('Player 1 Wins' if result == 1 else 'Player 2 Wins')
+

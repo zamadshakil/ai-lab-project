@@ -1,0 +1,105 @@
+Lab 11: Adversarial Search under Uncertainty – The Expecti-Minimax Algorithm
+Lab Objectives
+By the conclusion of this lab session, students will be comprehensively equipped to:
+1. Differentiate Deterministic vs. Stochastic Search: Understand the critical operational breakdown when moving from purely competitive environments (Minimax) to environments featuring elements of chance or probability.
+2. Formulate Expecti-Minimax Trees: Diagram and structurally map game spaces consisting of Maximizing nodes, Minimizing nodes, and Chance nodes.
+3. Implement Expected Value Equations: Incorporate probabilistic weighting equations (∑ P(s) × V(s)) into standard recursive backpropagation loops.
+4. Code Stochastic Logic in Python: Build a robust, scalable recursive script solving dynamic logic games with underlying random distributions.
+5. Analyze Risk Sensitivity: Discern how altering chance distributions impacts an AI agent's gameplay behavior from aggressive to highly defensive postures.
+
+
+1. Theoretical Background & Foundations
+In previous laboratory sessions, your exploration of Adversarial Search focused entirely on deterministic, perfect-information environments. Using the Minimax algorithm and Alpha-Beta pruning, agents operated under the rigid assumption that every decision leads strictly to a definitive, fully foreseeable game configuration. In games like Chess or Tic-Tac-Toe, if an agent executes a move, the resulting state is guaranteed.
+However, real-world scenarios and many classic games (e.g., Backgammon, Monopoly, Poker, or localized tactical scenarios involving environmental failures) introduce uncertainty. This uncertainty can stem from dice rolls, card shuffles, weather conditions, or unexpected mechanical slippage. In AI terminology, these are classified as Stochastic Games.
+1.1 The Structural Evolution of Game Trees
+To model uncertainty, we must introduce a third node type into our state-space architecture: The Chance Node. The game tree now alternates between three layers rather than two:
+1. MAX Nodes (Triangles pointing Up / Rectangles): Represent the AI agent's turns. The objective remains unchanged: maximize the utility propagated from the lower layers.
+2. MIN Nodes (Triangles pointing Down / Circles): Represent the perfect opponent's turns. The objective remains unchanged: minimize the utility to sabotage the AI.
+3. CHANCE Nodes (Circles or Diamonds with distinct labeling): Represent nature, environment, or a randomizing device (e.g., dice roll). These nodes do not make strategic choices; instead, they branch into multiple possible states based on a set probability distribution.
+1.2 Mathematical Formulation of Expecti-Minimax
+V(node) = Static_Utility(node)   [If Terminal State]V(node) = max_{c ∈ Children} V(c)   [If MAX Node]V(node) = min_{c ∈ Children} V(c)   [If MIN Node]V(node) = ∑_{i} P(child_i) × V(child_i)   [If CHANCE Node]
+Where P(child_i) represents the precise probability of a specific random outcome occurring, and ∑ P(child_i) = 1.0.
+1.3 Deep Breakdown of the Algorithm Logic
+When the algorithm encounters a Chance Node during backtracking, it does not pick the minimum or maximum score. Instead, it computes the Expected Value (or mean value) of all the sub-branches. This forces the MAX player to play optimally relative to the odds. If a certain high-reward path has only a 1% chance of succeeding, the expected value will reflect that risk, pushing the AI toward a safer, higher-probability branch.
+1.4 Expecti-Minimax Pseudocode Framework
+function EXPECTIMINIMAX(node, depth, nodeType):    if depth == 0 or node is terminal:        return static_utility_value(node)            if nodeType == "MAX":        maxEval = -infinity        for each child in node.children:            eval = EXPECTIMINIMAX(child, depth - 1, "CHANCE")            maxEval = max(maxEval, eval)        return maxEval            elif nodeType == "MIN":        minEval = +infinity        for each child in node.children:            eval = EXPECTIMINIMAX(child, depth - 1, "CHANCE")            minEval = min(minEval, eval)        return minEval            elif nodeType == "CHANCE":        expectedEval = 0        for each child in node.children:            probability = get_probability(child)            eval = EXPECTIMINIMAX(child, depth - 1, next_strategic_player)            expectedEval = expectedEval + (probability * eval)        return expectedEval
+
+
+Practice Tasks
+Task 1: Evaluating a Static Expecti-Minimax Tree
+Objective: Implement a functional recursive script in Python to evaluate a pre-defined static tree containing consecutive MAX, CHANCE, and terminal nodes to isolate the optimal starting root value.
+Scenario Architecture: Consider a symmetric game structure where the root is a MAX node. The root branches into 2 distinct paths representing actions. Each action results in a CHANCE node (representing environmental intervention). Each CHANCE node branches into 3 terminal configurations with distinct utility values and predefined probabilities.
+Chance Node
+Child Branches
+Terminal Scores
+Probabilities
+Chance Node A (Left)
+A1, A2, A3
+10, 3, -2
+0.2, 0.5, 0.3
+Chance Node B (Right)
+B1, B2, B3
+5, 8, 0
+0.4, 0.4, 0.2
+
+
+
+
+Your Goal: Create a script implementing an explicit solution to compute the final, exact value at the root node. Your code must print out the intermediate calculations at each chance node to verify mathematical alignment.
+
+Task 2: Stochastic Sticks Game (The Next Stage of Nim)
+Objective: Build upon the 'Subtractive Sticks Game' from Lab 9 and 10 by introducing a stochastic component (slippage/chance) representing mechanical error or environmental interference.
+Scenario & Modification Rules:
+1. The match starts with a localized pile of exactly 7 sticks. Player 1 is MAX; Player 2 is MIN.
+2. A player intentionally declares their move: to remove either 1 stick or 2 sticks.
+3. STOCHASTIC RULE: Due to environmental hazard, there is a 20% chance (Probability = 0.2) that the player slips and successfully removes ONLY 1 stick, regardless of their intent. There is an 80% chance (Probability = 0.8) that the chosen move executes flawlessly.
+   • Note: If a player explicitly chooses to remove 1 stick, the outcome is guaranteed (1 stick is removed with 100% certainty, since slipping still results in 1 stick). If a player chooses to remove 2 sticks, there is an 80% chance 2 sticks are removed, and a 20% chance only 1 stick is removed.
+4. Win Condition (Misere Play Variant): The player forced to extract the final remaining stick loses the match (Terminal value = +1 if MAX wins, -1 if MIN wins).
+Your Goal: Develop an explicit Expecti-Minimax solution utilizing recursive states to analyze the 7-stick pile. Determine and output whether Player 1 can secure an expected positive value (forced strategic advantage) under these hazardous conditions. Your script must display the state evaluations at every step.
+2. Conceptual & Analytical Questions
+Answer the following conceptual questions on a separate sheet of paper or within your submission file:
+Question 1: In a classic Minimax tree with Alpha-Beta pruning, we cut off branches because we know an optimal opponent will never let us visit them. Can we apply standard Alpha-Beta pruning to an Expecti-Minimax tree where CHANCE node outcomes have open bounds? Justify your answer mathematically.
+Question 2: Suppose the probability distribution in Task 2 shifts such that the slip probability increases to 50% (Probability = 0.5). Explain qualitatively how this change impacts the decision-making of the Maximizer agent at the root node compared to a pure deterministic setting.
+
+
+
+
+
+
+
+Solutions Guide for Practice Tasks
+
+Task 1 Solution: Static Tree Evaluation
+The mathematical calculation for Task 1 is explicitly detailed below:
+• Chance Node A Expected Value: (10 × 0.2) + (3 × 0.5) + (-2 × 0.3) = 2.0 + 1.5 - 0.6 = 2.9
+• Chance Node B Expected Value: (5 × 0.4) + (8 × 0.4) + (0 × 0.2) = 2.0 + 3.2 + 0.0 = 5.2
+• Root Node (MAX) Decision: max(Value(A), Value(B)) = max(2.9, 5.2) = 5.2
+Hence, the expected optimal path leads to Chance Node B, yielding an expected value of 5.2.
+Task 1: Complete Python Solution Code
+def solve_static_expectiminimax():    # Explicit representation of terminal nodes and probabilities    chance_A_scores = [10, 3, -2]    chance_A_probs = [0.2, 0.5, 0.3]        chance_B_scores = [5, 8, 0]    chance_B_probs = [0.4, 0.4, 0.2]        # Compute Expected Value for Chance Node A    ev_A = sum(s * p for s, p in zip(chance_A_scores, chance_A_probs))    print(f"Computed Expected Value for Chance Node A (Left): {ev_A:.2f}")        # Compute Expected Value for Chance Node B    ev_B = sum(s * p for s, p in zip(chance_B_scores, chance_B_probs))    print(f"Computed Expected Value for Chance Node B (Right): {ev_B:.2f}")        # Max Player decision at root    root_value = max(ev_A, ev_B)    print(f"Optimal Value computed at Tree Root Node: {root_value:.2f}")    return root_valueif __name__ == "__main__":    print("--- TASK 1: STATIC EXPECTI-MINIMAX EVALUATION ---")    solve_static_expectiminimax()
+
+Task 2 Solution: Stochastic Sticks Game
+In this task, the game states dynamically transition based on intentional moves and chance interventions. The complete implementation features a strict recursive framework tracking `is_max` state-switching.
+When the rule dictates that picking the final stick loses, the base condition values must accurately reflect who is forced to take the final stick.
+If n = 0 (no sticks left): The player whose turn it is now has an empty pile because the previous player just extracted the last stick. The previous player loses, meaning the current player WINS.
+If n = 1: The current player is forced to take the 1 remaining stick (since 1 is the minimum legal move). Taking it means they immediately lose.
+
+Thus, the recursive depth architecture maps base evaluations as follows:
+V(node) = +1if MAX wins (i.e., pile empty on MAX's turn or 1 stick left on MIN's turn)
+V(node) = -1if MIN wins (i.e., pile empty on MIN's turn or 1 stick left on MAX's turn)
+
+Task 2: Complete Python Solution Code
+import mathdef expectiminimax_sticks(n, is_max):    # Base Case: Misere Play Win/Loss Assessment    # If 1 stick or fewer remain, the game has reached a terminal point    if n == 1:        # If it is currently MAX's turn, MAX is forced to take the last stick and loses.        # Hence, return -1 if is_max is True, and +1 if is_max is False (MIN loses).        return -1 if is_max else 1
+
+     if n == 0:
+        # If 0 sticks remain on MAX's turn, MIN took the last stick on the previous turn. Therefore, MIN loses and MAX wins (+1).
+        # If 0 sticks remain on MIN's turn, MAX took the last stick and loses (-1).
+        return 1 if is_max else -1
+            if is_max:        best_val = -math.inf        # Loop through all legal intended moves        for move in [1, 2]:            if n - move >= 0:                # Evaluate outcome via a dedicated chance handler                if move == 1:                    # Intentionally taking 1 stick has 100% deterministic execution                    ev = 1.0 * expectiminimax_sticks(n - 1, False)                elif move == 2:                    # Intentionally taking 2 sticks features environmental chance/slippage:                    # 80% chance of succeeding (n-2), 20% chance of slipping to 1 stick (n-1)                    ev = (0.8 * expectiminimax_sticks(n - 2, False)) + \                         (0.2 * expectiminimax_sticks(n - 1, False))                                best_val = max(best_val, ev)        return best_val    else:        best_val = math.inf        # Minimizer acts optimally to diminish MAX's utility        for move in [1, 2]:            if n - move >= 0:                if move == 1:                    ev = 1.0 * expectiminimax_sticks(n - 1, True)                elif move == 2:                    ev = (0.8 * expectiminimax_sticks(n - 2, True)) + \                         (0.2 * expectiminimax_sticks(n - 1, True))                                best_val = min(best_val, ev)        return best_valif __name__ == "__main__":    print("\n--- TASK 2: STOCHASTIC STICKS GAME (7 STICKS) ---")    starting_sticks = 7    result = expectiminimax_sticks(starting_sticks, True)    print(f"Final Expecti-Minimax Value at Root: {result:.4f}")    if result > 0:        print("Conclusion: Player 1 (MAX) has a structural expected advantage and should win.")    elif result < 0:        print("Conclusion: Player 2 (MIN) holds an expected strategic advantage.")    else:        print("Conclusion: The game results in an exact neutral risk allocation.")
+
+
+
+Conceptual Questions Guide
+• Question 1 Guide: Standard Alpha-Beta pruning cannot be easily applied to an Expecti-Minimax tree without upper and lower bounds on the leaf nodes. This is because a chance node takes an average, and an unexplored child could have an extremely large or infinitely high value that shifts the entire average significantly. Pruning is only possible if we establish strict mathematical bounds (e.g., maximum possible utility U_max) to calculate the maximum possible value an unvisited branch could provide.
+• Question 2 Guide: As slip probability increases to 50%, the action of choosing 2 sticks becomes highly volatile and less distinct from choosing 1 stick. The Maximizer agent will alter its behavior to avoid the 'Take 2' move if the lower-layer states of a slip lead to a losing state, shifting to a highly conservative or protective strategy to guarantee predictable state transitions.
+

@@ -1,0 +1,87 @@
+
+Lab 09: Adversarial Search
+Topic: Game Trees and the Minimax Algorithm
+
+1. Lab Objectives
+Define Adversarial Search: Identify the core characteristics of competitive environments where agents have conflicting goals.
+Construct Game Trees: Map game states to nodes and legal moves to edges to visualize the entire state-space.
+Code the Minimax Logic: Implement the recursive algorithm to maximize utility for the MAX player and minimize it for the MIN player.
+Predict Optimal Play: Use the algorithm to determine the best possible move assuming all players act optimally.
+Solve Subtractive Games: Apply the Minimax strategy to solve logic puzzles like the 'Sticks Game'.
+2. Introduction
+In this lab, we explore Adversarial Search, a search technique used in competitive environments where two or more agents have conflicting goals. This is the foundational logic driving modern gaming artificial intelligence across titles like Chess, Checkers, Tic-Tac-Toe, and Nim.
+3. Theoretical Background
+Game trees and the minimax algorithm are fundamental AI concepts for 2-player, turn-based, zero-sum games (e.g., Chess, Tic-Tac-Toe). A game tree maps all possible moves, with alternating nodes representing a maximizing player (seeking highest score) and a minimizing player (seeking lowest score). Minimax uses a recursive, depth-first search to determine the optimal move by propagating values from terminal nodes (win/loss) back to the root, assuming both players play optimally.
+3.1 Game Trees
+A game can be structurally represented as a tree where:
+Root Node: Represents the current state of the game.
+Nodes: Represent board configurations or specific game positions (states).
+Edges: Represent legal moves available to the current player.
+Terminal Nodes: Leaf nodes that represent the end of the game (win, lose, or draw).
+3.2 The Minimax Algorithm
+The Minimax algorithm is a recursive decision-making strategy used to determine the optimal sequence of moves for a player, under the foundational assumption that the opponent is also playing perfectly (optimally). It fundamentally splits operations between two adversarial roles:
+MAX: Aims to maximize the final utility value (score). This represents the AI's perspective.
+MIN: Aims to minimize the final utility value for MAX. This represents the opponent trying to force a loss.
+The Recursive Logic Framework:
+1. If the state is terminal, return its absolute static utility score.
+2. If it is MAX's turn, evaluate all child states recursively and return the maximum score.
+3. If it is MIN's turn, evaluate all child states recursively and return the minimum score.
+Key Concepts:
+Depth-First Search: The algorithm travels down to the terminal nodes of the tree.
+Backtracking: As it moves up the tree, it assigns values to nodes based on whether it was a MAX or MIN turn.
+Optimal Strategy: The algorithm assumes the opponent will play perfectly to minimize your gain.
+
+Example of Minimax Workflow:
+Step 1: The algorithm generates the entire game tree down to terminal nodes.
+Step 2: A heuristic evaluation function assesses non-terminal nodes to estimate their value if the game is too deep to calculate fully.
+Step 3: The values are backpropagated:
+If the parent node is a MIN node, take the minimum value of children.
+If the parent node is a MAX node, take the maximum value of children.
+Step 4: The final choice at the root is the move leading to the highest value.
+
+Algorithm Pseudocode:
+function MINIMAX(node, depth, isMaximizingPlayer):    if depth == 0 or node is terminal:        return static value of node    if isMaximizingPlayer:        maxEval = -infinity        for each child in node:            eval = MINIMAX(child, depth - 1, false)            maxEval = max(maxEval, eval)        return maxEval    else:        minEval = +infinity        for each child in node:            eval = MINIMAX(child, depth - 1, true)            minEval = min(minEval, eval)        return minEval
+Line-by-Line Breakdown:
+1. The Function Definition
+function MINIMAX(node, depth, isMaximizingPlayer):
+node: The current state of the game (e.g., how many sticks are left). 
+depth: How many moves ahead the AI should look. 
+isMaximizingPlayer: A True/False switch. If True, it’s MAX's turn. If False, it’s MIN's turn. 
+2. The Base Case (The "Exit Strategy")
+if depth == 0 or node is terminal:
+return static value of node
+Why this exists: Every recursive function needs a way to stop. If we've reached the maximum depth we want to search, or if someone has already won (a terminal state), we just return the score of that board. 
+3. The MAX Player’s Logic
+if isMaximizingPlayer:
+maxEval = -infinity
+Starting Point: MAX wants the highest score. We start with the lowest possible number (-∞) so that any actual score found will be higher. 
+for each child in node:
+eval = MINIMAX(child, depth - 1, false)
+The Loop: MAX looks at every possible move (child). For each move, it calls the MINIMAX function again to see what happens next.
+The Switch: Notice isMaximizingPlayer becomes false. MAX is basically saying, "If I make this move, what will my opponent (MIN) do?". 
+maxEval = max(maxEval, eval)
+The Choice: After seeing the result of a move, MAX keeps the highest value found so far. 
+4. The MIN Player’s Logic
+else:
+minEval = +infinity
+Starting Point: MIN wants the lowest score for MAX. We start with +∞ so any real score found will be lower. 
+for each child in node:
+eval = MINIMAX(child, depth - 1, true)
+The Loop: MIN also looks at all moves, but calls MINIMAX with true. MIN is asking, "If I make this move to ruin MAX's score, what will MAX do to recover?". 
+minEval = min(minEval, eval)
+The Choice: MIN keeps the lowest value found, assuming it will be the "best" move for them to sabotage the AI. 
+5. The Final Result
+return maxEval (or minEval)
+Backtracking: Once all moves are checked, the function passes the best value found up to the previous "layer" of the tree until it reaches the very first call at the root. 
+Helpful Video Links:
+You can check out these links for further clarification of your concepts:
+https://www.youtube.com/watch?v=5y2a0Zhgq0U
+https://www.youtube.com/watch?v=Ntu8nNBL28o
+
+4. Practice Tasks
+Task 1: Evaluating a Static Game Tree
+Objective: Map a static game tree into functional python collections and compute values using recursion.In many testing scenarios, the complete structure of a game tree is already established, requiring only a reverse traversal to identify optimal choices. Given an array representing 8 terminal leaf nodes from a symmetric binary tree with a total depth of 3:    scores = [3, 5, 2, 9, 12, 5, 23, 23]Your Goal: Build a functional script implementing a recursive function minimax(depth, nodeIndex, isMax, scores) to find and output the precise value computed at the tree root node.
+
+Task 2: Modified Nim Subtractive Sticks Game
+Objective: Introduce state modification rules to a live-calculated minimax instance.Scenario Rules:1. The game match begins with a localized pile containing exactly 7 sticks total.2. Two distinct players take turns sequentially removing either 1 or 2 sticks per round.3. The player forced to take the final remaining stick wins the match.Your Goal: Develop an adversarial search solution utilizing Minimax logic to analyze this sequence and confirm definitively whether Player 1 (the maximizing starting player) can secure a forced victory assuming flawless strategic defensive plays from Player 2.
+Hint: Dry run your code in the form shown in following picture to verify your results: 

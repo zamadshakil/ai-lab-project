@@ -1,0 +1,158 @@
+Artificial Intelligence
+Lab 08
+Topic
+
+Implementation of Meta-Heuristics and Local Search:  Hill Climbing, Local Minima and Maxima, Variants of Hill Climbing Algorithm
+Objective
+ Understand the concept of Meta-Heuristics and Local Search.
+ Visualize and identify Local Minima and Maxima.
+ Implement the Hill Climbing algorithm and its variants.
+
+
+
+
+Introduction to Local Search
+Unlike systematic search algorithms (like BFS or DFS) that explore the entire state space to find a path to a goal, Local Search algorithms operate using a single "current node" and move only to neighbors of that node. They are "memoryless" in the sense that they do not keep track of the paths taken.
+
+Hill Climbing (Greedy Local Search)
+Hill Climbing is a mathematical optimization technique which belongs to the family of local search. It is an iterative algorithm that starts with an arbitrary solution to a problem, then attempts to find a better solution by making a small change to the solution. 
+If the change produces a better solution, another incremental change is made to the new solution, and so on until no further improvements can be found.
+
+The "Landscape" Problem
+In optimization, we often visualize our function as a State-Space Landscape.
+Local Maximum: A peak that is higher than its neighbors but lower than the highest point in the landscape.
+Global Maximum: The absolute highest point in the entire landscape.
+Plateau: A flat area where neighbors have the same value, making it hard for the algorithm to decide where to move.
+
+State-Space Diagram in Hill Climbing
+The state-space diagram is a visual representation of all possible states the search algorithm can reach, plotted against the values of the objective function (the function we aim to maximize).
+
+In the state-space diagram:
+X-axis: Represents the state space which includes all the possible states or configurations that the algorithm can reach.
+Y-axis: Represents the values of the objective function corresponding to each state.
+
+The optimal solution in the state-space diagram is represented by the state where the objective function reaches its maximum value, also known as the global maximum.
+
+Variants of Hill Climbing
+Simple Hill Climbing: Takes the first neighbor that is better than the current state.
+Steepest-Ascent Hill Climbing: Evaluates all neighbors and chooses the one that offers the maximum improvement.
+Stochastic Hill Climbing: Chooses at random from among the uphill moves.
+
+Hill Climbing Pseudo-code
+
+FUNCTION Simple_Hill_Climbing(initial_state, step_size):
+    # 1. Initialize the current position
+    current_position = initial_state
+    current_value = Evaluate(current_position)
+
+    LOOP:
+        # 2. Explore a neighbor (the next potential step)
+        neighbor_position = current_position + step_size
+        neighbor_value = Evaluate(neighbor_position)
+
+        # 3. Decision Rule: Is the neighbor better?
+        IF neighbor_value > current_value:
+            # Move uphill
+            current_position = neighbor_position
+            current_value = neighbor_value
+        ELSE:
+            # 4. Termination: No improvement possible
+            RETURN current_position
+Key Concepts to Note
+The "Greedy" Nature: The algorithm doesn't care if there is a much taller mountain further away; it only cares about the next immediate step.
+The Look-Ahead: In code, we must calculate the neighbor_value before we decide to move. This is the "evaluation" step.
+Infinite Loops: Note that if the neighbor_value is always greater, the loop never ends. This is why we use a mathematical function with a clear peak (like the parabola in Task 1) or a maximum iteration limit.
+
+
+Simple Hill Climbing
+Simple hill climbing is the simplest way to implement a hill-climbing algorithm. It only evaluates the neighbour node state at a time and selects the first one which optimizes current cost and set it as a current state. It only checks it’s one successor state, and if it finds better than the current state, then move else be in the same state. 
+Step 1: Evaluate the initial state, if it is goal state then return success and Stop. 
+Step 2: Loop Until a solution is found or there is no new operator left to apply. 
+Step 3: Select and apply an operator to the current state. 
+Step 4: Check new state: 
+i. If it is goal state, then return success and quit. 
+ii. else if it is better than the current state then assign new state as a current state. 
+iii. else if not better than the current state, then return to step 2. 
+Step 5: Exit.
+
+Example Code:
+
+# 1. Define the Objective Function (The Hill)
+# f(x) = -(x-5)^2 + 20
+def objective_function(x):
+    return -(x - 5)**2 + 20
+
+def simple_hill_climbing(start_x, step_size):
+    """
+    Finds the maximum of a function by moving in a fixed direction.
+    """
+    current_x = start_x
+    current_value = objective_function(current_x)
+    
+    print(f"Starting at: x = {current_x}, f(x) = {current_value}")
+    
+    while True:
+        # Look ahead at the next neighbor
+        next_x = current_x + step_size
+        next_value = objective_function(next_x)
+        
+        # Check if the neighbor is 'higher' than current position
+        if next_value > current_value:
+            # Move to the new position
+            current_x = next_x
+            current_value = next_value
+            print(f"Climbing... New x: {current_x:.2f}, New f(x): {current_value:.2f}")
+        else:
+            # If the neighbor is lower or equal, we have reached the peak
+            print("Reached the peak (or a local maximum).")
+            break
+            
+    return current_x, current_value
+
+# 2. Execution
+# Start from x=0 with a step size of 0.1
+final_x, final_val = simple_hill_climbing(start_x=0, step_size=0.1)
+
+print(f"\nFinal Result:")
+print(f"Optimal x: {final_x:.2f}")
+print(f"Max Value: {final_val:.2f}")
+
+
+Steepest-Ascent Hill Climbing
+The steepest-Ascent algorithm is a variation of the simple hill-climbing algorithm. This algorithm examines all the neighboring nodes of the current state and selects one neighbor node which is closest to the goal state. This algorithm consumes more time as it searches for multiple neighbors. 
+Step 1: Evaluate the initial state, if it is goal state then return success and stop, else make the current state as your initial state. 
+Step 2: Loop until a solution is found or the current state does not change. 
+i. Let S be a state such that any successor of the current state will be better than it. 
+ii. For each operator that applies to the current state; 
+▪ Apply the new operator and generate a new state. 
+▪ Evaluate the new state. 
+▪ If it is goal state, then return it and quit, else compare it to the S. 
+▪ If it is better than S, then set new state as S. 
+▪ If the S is better than the current state, then set the current state to S. 
+Step 5: Exit.
+
+
+Stochastic-Ascent Hill Climbing
+Stochastic hill climbing does not examine for all its neighbors before moving. Rather, this search algorithm selects one neighbor node at random and evaluate it as a current state or examine another state.
+
+
+
+
+Lab Practice Tasks
+
+Task 1: Finding the Peak (Simple Hill Climbing)
+Implement a Python script to find the maximum value of a simple 1D function: f(x) = -x^3 + 6x^2 - 9x + 15.
+Start Point: x = 0.5
+Step Size: 0.05
+Task: Move x to the right as long as f(x) increases. Stop when f(x + step) < f(x).
+
+Expected Learning Outcome:
+You will observe that the algorithm stops as soon as the slope turns downwards. By starting at x=0.5, the algorithm should climb toward the local peak located at x=1.0.
+
+
+Task 2: Travelling Salesman Problem
+Suppose a TCS delivery boy has to deliver parcels from Head Office (MM Alam Road) to 7 different locations in Lahore (Johar Town, Shahdara, DHA Phase 6, Wapda Town, Askari 10, Allama Iqbal Town, Mall Road) and then return back to the Head Office. He wants to find the route with least travelling distance. Can you help him with that using Hill Climbing Algorithm?
+
+[You can take random values (between 0-50) for distances between any two spots.]
+
+Note: Submit code and its output in a single word file for both tasks.

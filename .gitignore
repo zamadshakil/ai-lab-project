@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.gemini/
+.idea/
+.vscode/
+~$*
+profile_results.json

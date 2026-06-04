@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specter's Bridge AI Laboratory</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Chart.js for statistics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="void-background"></div>
+    <div class="container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <h1 class="fantasy-title">Specter's Bridge</h1>
+            <p class="subtitle">A First-Principles Laboratory of Stochastic Adversarial Search, RL, and Evolution</p>
+            <div class="current-config-bar">
+                <span>Planks: <strong id="val-config-n" aria-live="polite">12</strong></span>
+                <span>Slip Prob: <strong id="val-config-p" aria-live="polite">0.20</strong></span>
+                <span>Mode: <strong id="val-config-mode" aria-live="polite">Normal Play</strong></span>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT GRID -->
+        <main class="dashboard-grid">
+            <!-- PANEL 1: CHASM ARENA (GAME SIMULATION) -->
+            <section class="glass-card panel-arena" aria-labelledby="arena-title">
+                <h2 id="arena-title" class="panel-title text-green">The Chasm Arena</h2>
+                <div class="canvas-container">
+                    <canvas id="arenaCanvas" width="560" height="200" role="img" aria-label="Interactive game board showing the planks of the chasm bridge, the positions of the traveler, and hazardous tiles (treasures, traps, and slippery planks)."></canvas>
+                </div>
+                
+                <div class="arena-controls">
+                    <div class="control-row">
+                        <label for="agentSelect">Agent:</label>
+                        <select id="agentSelect" class="custom-select">
+                            <option value="player">Human Player (Manual)</option>
+                            <option value="expectiminimax" selected>Expectiminimax Agent</option>
+                            <option value="qlearning">Q-Learning Agent</option>
+                            <option value="heuristic">Heuristic (1-Step Greedy)</option>
+                            <option value="random">Random Agent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-actions">
+                        <button id="btn-step1" class="btn btn-action" disabled>Step 1</button>
+                        <button id="btn-leap2" class="btn btn-action" disabled>Leap 2</button>
+                        <button id="btn-ai-play" class="btn btn-primary">Execute AI Turn</button>
+                    </div>
+                </div>
+
+                <div class="game-scores">
+                    <div class="score-box max-score-box">
+                        <span class="score-label">MAX (Traveler)</span>
+                        <span id="score-max" class="score-value" aria-live="polite">0</span>
+                    </div>
+                    <div class="score-box turn-indicator-box">
+                        <span class="score-label">Active Turn</span>
+                        <span id="active-player" class="score-value text-blue" aria-live="polite">MAX</span>
+                    </div>
+                    <div class="score-box min-score-box">
+                        <span class="score-label">MIN (Specter)</span>
+                        <span id="score-min" class="score-value" aria-live="polite">0</span>
+                    </div>
+                </div>
+
+                <div class="log-container">
+                    <h3>Chronicle of Moves</h3>
+                    <div id="game-log" class="game-log" aria-live="polite">
+                        <div class="log-entry system">Chasm environment initialized.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PANEL 2: THE BRAIN (STAR2 DECISION TREE VISUALIZER) -->
+            <section class="glass-card panel-tree" aria-labelledby="tree-title">
+                <h2 id="tree-title" class="panel-title text-blue">The Decision Tree Explorer</h2>
+                
+                <div class="tree-controls-bar">
+                    <div class="toggle-container">
+                        <label class="switch">
+                            <input type="checkbox" id="check-prune" aria-labelledby="prune-label-text" checked>
+                            <span class="slider round"></span>
+                        </label>
+                        <span id="prune-label-text" class="toggle-label">Star2 Pruning</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="range-depth">Depth: <span id="depth-label">3</span></label>
+                        <input type="range" id="range-depth" min="1" max="4" value="3" class="depth-slider">
+                    </div>
+                </div>
+
+                <div class="tree-stats-row">
+                    <span>States Checked: <strong id="tree-states-checked" aria-live="polite">0</strong></span>
+                    <span>Branches Cut: <strong id="tree-branches-cut" class="text-red" aria-live="polite">0</strong></span>
+                    <span>Value at Root: <strong id="tree-root-value" class="text-green" aria-live="polite">0.0</strong></span>
+                </div>
+
+                <div class="tree-viewport">
+                    <svg id="treeSvg" width="600" height="340" role="img" aria-label="Expectiminimax decision tree visualization showing max nodes, min nodes, chance nodes, evaluated edge weights, probability values, and pruned branches."></svg>
+                    <div class="tree-legend">
+                        <span class="legend-item"><span class="legend-dot max-dot"></span>MAX Node</span>
+                        <span class="legend-item"><span class="legend-dot min-dot"></span>MIN Node</span>
+                        <span class="legend-item"><span class="legend-dot chance-dot"></span>Chance Node</span>
+                        <span class="legend-item"><span class="legend-dot prune-dot"></span>Pruned</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PANEL 3: MACHINE LEARNING & EVOLUTIONARY LABS -->
+            <section class="glass-card panel-labs" aria-labelledby="labs-title">
+                <h2 id="labs-title" class="panel-title text-orange">Heuristics & Learning Labs</h2>
+
+                <!-- TAB CONTAINER -->
+                <div class="tabs-header" role="tablist" aria-label="Learning and Setup Labs">
+                    <button id="tab-btn-setup" role="tab" aria-selected="true" aria-controls="tab-setup" class="tab-btn active" onclick="switchTab('tab-setup')">Board Setups</button>
+                    <button id="tab-btn-qlearning" role="tab" aria-selected="false" aria-controls="tab-qlearning" class="tab-btn" onclick="switchTab('tab-qlearning')">Q-Learning</button>
+                    <button id="tab-btn-ga" role="tab" aria-selected="false" aria-controls="tab-ga" class="tab-btn" onclick="switchTab('tab-ga')">Genetic Algorithm</button>
+                </div>
+
+                <!-- TAB 1: BOARD SETUP -->
+                <div id="tab-setup" role="tabpanel" aria-labelledby="tab-btn-setup" class="tab-content active">
+                    <h3>Initialize Environment Parameters</h3>
+                    <div class="setup-form">
+                        <div class="setup-group">
+                            <label for="setup-n">Plank Count:</label>
+                            <input type="number" id="setup-n" min="4" max="30" value="12" class="custom-input">
+                        </div>
+                        <div class="setup-group">
+                            <label for="setup-p">Slip Probability:</label>
+                            <input type="number" id="setup-p" min="0" max="1" step="0.05" value="0.2" class="custom-input">
+                        </div>
+                        <div class="setup-group">
+                            <label for="setup-mode">Play Ruleset:</label>
+                            <select id="setup-mode" class="custom-select">
+                                <option value="normal">Normal Play (Last step wins)</option>
+                                <option value="misere">Misere Play (Last step loses)</option>
+                            </select>
+                        </div>
+                        <button id="btn-reconfigure" class="btn btn-primary w-100">Reset & Apply Environment</button>
+                    </div>
+                    
+                    <div class="legend-board">
+                        <h4>Bridge Hazards Key:</h4>
+                        <div class="legend-board-items">
+                            <div class="board-key-item"><span class="key-box key-treasure"></span>Treasure (+2)</div>
+                            <div class="board-key-item"><span class="key-box key-trap"></span>Void Trap (-3)</div>
+                            <div class="board-key-item"><span class="key-box key-slippery"></span>Slippery (Double Slip)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Q-LEARNING -->
+                <div id="tab-qlearning" role="tabpanel" aria-labelledby="tab-btn-qlearning" class="tab-content">
+                    <div class="tab-desc">
+                        Trains a model-free temporal difference agent to learn optimal actions without tree lookahead.
+                    </div>
+                    <div class="control-row">
+                        <label for="train-episodes">Training Cycles:</label>
+                        <input type="number" id="train-episodes" min="1000" max="50000" step="1000" value="10000" class="custom-input">
+                        <button id="btn-train-q" class="btn btn-secondary">Train Q-Agent</button>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="qChart"></canvas>
+                    </div>
+                    <div id="q-status" class="train-status text-blue" aria-live="polite">Agent status: Untrained (Using default policies).</div>
+                </div>
+
+                <!-- TAB 3: GENETIC ALGORITHM -->
+                <div id="tab-ga" role="tabpanel" aria-labelledby="tab-btn-ga" class="tab-content">
+                    <div class="tab-desc">
+                        Evolves Heuristic evaluation weights via tournament round-robin matches.
+                    </div>
+                    <div class="control-row inline">
+                        <button id="btn-ga-1" class="btn btn-secondary">Run 1 Generation</button>
+                        <button id="btn-ga-10" class="btn btn-primary">Run 10 Generations</button>
+                        <button id="btn-ga-reset" class="btn btn-danger">Reset GA</button>
+                    </div>
+
+                    <div class="weights-display">
+                        <h4>Best Heuristic Weights Evolved:</h4>
+                        <div class="weights-grid">
+                            <div class="weight-item">Gold Weight: <span id="wt-gold" class="text-green" aria-live="polite">2.00</span></div>
+                            <div class="weight-item">Trap Weight: <span id="wt-trap" class="text-red" aria-live="polite">-3.00</span></div>
+                            <div class="weight-item">Progress Weight: <span id="wt-prog" class="text-blue" aria-live="polite">1.50</span></div>
+                            <div class="weight-item">Risk Weight: <span id="wt-risk" class="text-orange" aria-live="polite">-2.00</span></div>
+                        </div>
+                        <button id="btn-apply-weights" class="btn btn-action w-100">Apply Evolved Weights to Adversarial Search</button>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="gaChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- D3.js or tree rendering script helper -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

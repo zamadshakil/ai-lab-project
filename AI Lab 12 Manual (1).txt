@@ -1,0 +1,166 @@
+Lab 12: OPTIMIZATION VIA GENETIC ALGORITHMS (GA)
+Lab Objectives
+By the conclusion of this lab session, students will be comprehensively equipped to:
+Understand the foundational biological concepts underlying Genetic Algorithms, including chromosomes, genes, alleles, populations, and natural selection.
+Master chromosome representation designs by applying binary schemas to numeric maximization problems and permutation schemas to routing challenges.
+Implement heuristic evaluation functions (fitness functions) that map candidate problem solutions to quantitative fitness scores.
+Develop probabilistic parent selection mechanics including Roulette Wheel Selection and Tournament Selection methodologies.
+Program foundational genetic recombination operators (Single-Point Crossover, Ordered Crossover) and structural mutations (Bit-Flip, Swap Mutation).
+
+1. Theoretical Background & Foundations
+Genetic algorithms are usually used to identify optimal solutions to complex problems. This can clearly be easily mapped to search methods, which are aiming toward a similar goal. Genetic algorithms can thus be used to search for solutions to multi-value problems where the closeness of any attempted solution to the actual solution (fitness) can be readily evaluated. In short, a population of possible solutions (chromosomes) is generated, and a fitness value for each chromosome is determined. This fitness is used to determine the likelihood that a given chromosome will survive to the next generation, or reproduce. Reproduction is done by applying crossover to two (or more) chromosomes, whereby features (genes) of each chromosome are combined together. Mutation is also applied, which involves making random changes to particular genes.
+
+Genetic Algorithms (GAs) simulate Darwinian evolution to solve complex optimization problems. They iteratively refine a population of candidate solutions by mimicking biological processes: representation (encoding solutions), fitness (evaluating success), and selection (choosing parents for the next generation).
+
+1.1 Representation (Encoding)
+Representation defines how a candidate solution is structured within the computer’s memory. It acts as the "chromosome" or "genotype" of your solution.
+Binary Representation: The most common approach. Solutions are encoded as a string of 1s and 0s. Best for: Problems requiring yes/no decisions or feature subset selections. 
+Integer/Real-Valued Representation: Chromosomes are lists of integers or floating-point numbers. Best for: Continuous optimization problems, parameter tuning, or pathfinding (e.g., [latitude, longitude]).
+Permutation Representation: Solutions are ordered sequences (e.g., [1, 3, 2, 4]). Best for: Ordering problems like the Traveling Salesperson Problem (TSP) or scheduling.
+
+1.2 Fitness Evaluation
+The fitness function quantifies exactly how "good" a specific chromosome is at solving the target problem. It serves as the evolutionary environment that drives the search.
+Objective: If you are trying to maximize a mathematical function (e.g., f(x) = x^2), the raw function can be your fitness value.
+Penalties: Constraints can be enforced by subtracting penalty points from the raw score if a solution violates problem rules (e.g., exceeding a cargo weight limit).
+Normalization: Often, raw fitness scores are normalized (scaled) to prevent ultra-fit individuals from dominating the population too quickly during early iterations.
+
+1.3 Selection
+Selection simulates "survival of the fittest". It picks the best chromosomes from the current population to act as parents for creating the next generation.
+Roulette Wheel Selection: Individuals are assigned a slice of a virtual roulette wheel proportional to their fitness. Fitter individuals have a larger slice and a higher probability of being chosen, but weaker individuals still retain a small chance to mate.
+Tournament Selection: A random subset (e.g., 5 individuals) is chosen from the population, and the one with the highest fitness is selected as a parent. This is highly efficient and easily parallelized.
+Rank-Based Selection: Individuals are sorted by fitness, and selection probability is based on rank rather than absolute fitness values. This prevents early convergence when fitness scores are tightly clustered.
+
+1.4 Reproduction (Offspring Generation)
+After selection, the algorithm applies genetic operators to create the next generation:
+Crossover (Recombination): Pairs of selected parents exchange genetic information to produce offspring. Common methods include single-point crossover (swapping gene sequences after a random index) or uniform crossover (mixing genes randomly from both parents).
+Mutation: Randomly alters small parts of the offspring's genes (e.g., flipping a bit from 0 to 1). This introduces new diversity and helps the algorithm escape local optima.
+
+
+Practice Tasks
+Task 1: 
+Consider the problem of maximizing the function
+
+where 𝑥 is allowed to vary between 0 and 31. You must perform following tasks in the code.
+
+a. Representation of states (solutions): To solve this using a genetic algorithm, we must encode the possible values of 𝑥 as chromosomes. For this problem, we will encode 𝑥 as a binary integer of length 5. Thus the chromosomes for our genetic algorithm will be sequences of 0's and 1's with a length of 5 bits, and have a range from 0 (00000) to 31 (11111). 
+b. Fitness function: The fitness function for it will be: 
+
+
+To begin the algorithm, we select an initial population of 10 chromosomes at random. The resulting initial population of chromosomes is shown in Table 1. Next we take the x-value that each chromosome represents and test its fitness with the fitness function. The resulting fitness values are recorded in the third column of Table 1.
+Chromosome Number
+Initial Population
+
+𝒙-Value
+
+Fitness Value 𝒇(𝒙)
+
+Selection Probability
+
+1
+0 1 0 1 1
+
+11
+20.9
+0.1416
+
+2
+1 1 0 1 0 
+
+26
+10.4
+0.0705
+
+3
+0 0 0 1 0
+
+2
+5.6
+0.0379
+
+4
+0 1 1 1 0 
+
+14
+22.4
+0.1518
+
+5
+0 1 1 0 0
+
+12
+21.6
+0.1463
+
+6
+1 1 1 1 0 
+
+30
+0
+0
+7
+1 0 1 1 0
+
+22
+17.6
+0.1192
+
+8
+0 1 0 0 1 
+
+9
+18.9
+0.1280
+
+9
+0 0 0 1 1
+
+3
+8.1
+0.0549
+
+10
+1 0 0 0 1 
+
+17
+22.1
+0.1497
+
+
+c. Operators: 
+i. Apply cross over in every generation. 
+ii. Apply mutation after every 3 generations. 
+
+d. Termination criteria: Your loop should stop when the value of one of your candidate’s fitness function is greater or equal to 90%.
+
+Task 2: 
+Objective: Optimize a 1D numeric mathematical function using a 5-bit binary chromosome. Find the integer coordinate x bounded within the range [0, 31] that maximizes the objective valuation function:
+f(x) = x^2 - 4x + 10
+
+Implementation Details:
+
+1. Chromosome Structure: An individual is an array of 5 binary bits (e.g., [1, 0, 1, 0, 0]).
+2. Phenotype Conversion: Implement a function to decode this binary list into its base-10 integer representation.
+3. Selection Mechanism: Implement a 2-way Tournament Selection operator.
+4. Operators: Implement standard Single-Point Crossover and Bit-Flip Mutation.
+
+Task 2 Python Starter Template:
+
+
+Task 3: 
+For any given 'target' number, find an expression involving any legal combination of addition(+), subtraction(-), multiplication(*) and division(/) on digits that represents the given target number. For example, for the target 15, "9 + 3 * 2" is a solution."
+
+
+Task 4: 
+You have 10 cards numbered 1 to 10. You have to divide them into two piles so that:
+The sum of the first pile is as close as possible to 36.
+And the product of all in the second pile is as close as possible to 360. 
+
+Well, all that is being done is the following : 
+Loop through the population member's genes 
+If the current gene being looked at has a value of 0, the gene is for the sum pile (pile 0), so add to the running calculation. 
+If the current gene being looked at has a value of 1, the gene is for the product pile (pile 1), so add to the running calculation. 
+Calculate the overall error for this population member. If this member's geneotype has an overall error of 0.0, then the problem domain has been solved.
+
+
+
+
