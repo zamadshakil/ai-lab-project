@@ -180,7 +180,7 @@ def train_qlearning(req: TrainRequest):
     
     # Sync global Q-agent if matching global env settings
     global global_q_agent
-    if req.n_planks == global_env.n_planks and req.slip_prob == global_env.slip_prob:
+    if req.n_planks == global_env.n_planks and req.slip_prob == global_env.slip_prob and req.play_mode == global_env.play_mode:
         global_q_agent = q_agent
         
     # Format Q-table for visualization

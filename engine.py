@@ -334,22 +334,25 @@ class ExpectiminimaxSolver:
             # Compute Star2 bounding search windows for the remaining child nodes
             if prune:
                 p_rem = 1.0 - (p_eval + prob) # Probabilities of remaining children
+                p_div = max(1e-9, prob)
                 if parent_is_max:
-                    # MAX node parent: set new alpha_child
-                    alpha_c = (alpha - s_eval - p_rem * self.V_max) / prob
+                    # MAX node parent: set new alpha_child and tighten beta_child
+                    alpha_c = (alpha - s_eval - p_rem * self.V_max) / p_div
                     alpha_c = max(self.V_min, alpha_c)
-                    beta_c = beta
+                    beta_c = (beta - s_eval - p_rem * self.V_min) / p_div
+                    beta_c = min(self.V_max, beta_c)
                 else:
-                    # MIN node parent: set new beta_child
-                    alpha_c = alpha
-                    beta_c = (beta - s_eval - p_rem * self.V_min) / prob
+                    # MIN node parent: set new beta_child and tighten alpha_child
+                    alpha_c = (alpha - s_eval - p_rem * self.V_max) / p_div
+                    alpha_c = max(self.V_min, alpha_c)
+                    beta_c = (beta - s_eval - p_rem * self.V_min) / p_div
                     beta_c = min(self.V_max, beta_c)
             else:
                 alpha_c, beta_c = -math.inf, math.inf
                 
             # If search window is collapsed, prune immediately!
             if prune and alpha_c >= beta_c:
-                self.nodes_pruned += (len(transitions) - idx)
+                self.nodes_pruned += 1
                 # Render pruned indicator in tree
                 chance_children.append({
                     "name": f"Pruned_S{self.env.n_planks - next_state[0]}",
@@ -470,7 +473,14 @@ class QLearningAgent:
         """Train the agent by self-play."""
         history = []
         for ep in range(episodes):
-            state = self.env.get_initial_state()
+            # Implement 30% Exploratory Starts to cover the entire state-space for 100% convergence
+            if random.random() < 0.3:
+                rem = random.randint(1, self.env.n_planks)
+                is_max = random.choice([True, False])
+                state = (rem, is_max, 0, 0)
+            else:
+                state = self.env.get_initial_state()
+                
             total_td_error = 0.0
             steps = 0
             

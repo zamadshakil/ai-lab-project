@@ -230,12 +230,12 @@ function drawArena() {
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
     
-    // Draw Void Chasm glow background
-    ctx.fillStyle = "#0c0a18";
+    // Draw clean background
+    ctx.fillStyle = "#fafafa";
     ctx.fillRect(0, 0, w, h);
     
-    // Draw mist particles
-    ctx.fillStyle = "rgba(10, 132, 255, 0.05)";
+    // Draw mist particles (subtle accent glow)
+    ctx.fillStyle = "rgba(0, 113, 227, 0.02)";
     ctx.beginPath();
     ctx.arc(w/2, h + 50, 150, 0, Math.PI * 2);
     ctx.fill();
@@ -282,34 +282,24 @@ function drawPlankArea(x, y, width, height, type, idx) {
     ctx.save();
     
     // Design matching colors
-    let strokeColor = "rgba(255, 255, 255, 0.2)";
-    let fillColor = "rgba(50, 40, 80, 0.4)";
-    let shadowGlow = "none";
+    let strokeColor = "#d2d2d7";
+    let fillColor = "#ffffff";
     
     if (type === "start") {
-        fillColor = "rgba(80, 80, 100, 0.5)";
-        strokeColor = "rgba(255, 255, 255, 0.4)";
+        fillColor = "#e5e5e7";
+        strokeColor = "#86868b";
     } else if (type === "end") {
-        fillColor = "rgba(48, 209, 88, 0.15)";
-        strokeColor = "rgba(48, 209, 88, 0.5)";
-        shadowGlow = "rgba(48, 209, 88, 0.4)";
+        fillColor = "#e2f6e9";
+        strokeColor = "#34c759";
     } else if (type === "treasure") {
-        fillColor = "rgba(48, 209, 88, 0.15)";
-        strokeColor = "var(--color-green)";
-        shadowGlow = "rgba(48, 209, 88, 0.3)";
+        fillColor = "#e2f6e9";
+        strokeColor = "#34c759";
     } else if (type === "trap") {
-        fillColor = "rgba(255, 69, 58, 0.12)";
-        strokeColor = "var(--color-red)";
-        shadowGlow = "rgba(255, 69, 58, 0.3)";
+        fillColor = "#fce8e6";
+        strokeColor = "#ff3b30";
     } else if (type === "slippery") {
-        fillColor = "rgba(10, 132, 255, 0.12)";
-        strokeColor = "var(--color-blue)";
-        shadowGlow = "rgba(10, 132, 255, 0.3)";
-    }
-
-    if (shadowGlow !== "none") {
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = shadowGlow;
+        fillColor = "#e8f2fc";
+        strokeColor = "#0071e3";
     }
     
     // Draw wood block
@@ -323,7 +313,7 @@ function drawPlankArea(x, y, width, height, type, idx) {
     
     // Write index number for planks
     if (idx !== undefined) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
         ctx.shadowBlur = 0;
         ctx.font = "bold 9px monospace";
         ctx.textAlign = "center";
@@ -337,8 +327,8 @@ function drawTraveler(x, y) {
     ctx.save();
     
     // Glow shadow
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = gameState[1] ? "rgba(48, 209, 88, 0.8)" : "rgba(255, 69, 58, 0.8)";
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = gameState[1] ? "rgba(52, 199, 89, 0.4)" : "rgba(255, 59, 48, 0.4)";
     
     // Glowing active core
     ctx.fillStyle = gameState[1] ? "var(--color-green)" : "var(--color-red)";
@@ -347,7 +337,7 @@ function drawTraveler(x, y) {
     ctx.fill();
     
     // Outer floating ring
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
     ctx.lineWidth = 1.5;
     ctx.shadowBlur = 0;
     ctx.beginPath();
@@ -547,13 +537,13 @@ function drawLinksAndNodes(svg, node, bestMove) {
             color = "var(--color-red)";
             shape = "circle";
         } else if (n.type === "CHANCE") {
-            color = "var(--color-cyan)";
+            color = "var(--color-blue)";
             shape = "diamond";
         } else if (n.type === "PRUNED") {
-            color = "#444";
+            color = "var(--color-text-muted)";
             shape = "circle-dashed";
         } else if (n.type === "TERMINAL" || n.type === "LEAF") {
-            color = "#a1a1aa";
+            color = "#86868b";
             shape = "rect-round";
         }
         
@@ -565,7 +555,7 @@ function drawLinksAndNodes(svg, node, bestMove) {
             rect.setAttribute("width", 20);
             rect.setAttribute("height", 20);
             rect.setAttribute("rx", 3);
-            rect.setAttribute("fill", "#1a162a");
+            rect.setAttribute("fill", "#ffffff");
             rect.setAttribute("stroke", color);
             rect.setAttribute("stroke-width", "2");
             group.appendChild(rect);
@@ -576,7 +566,7 @@ function drawLinksAndNodes(svg, node, bestMove) {
             rect.setAttribute("width", 28);
             rect.setAttribute("height", 16);
             rect.setAttribute("rx", 8);
-            rect.setAttribute("fill", "#1a162a");
+            rect.setAttribute("fill", "#f5f5f7");
             rect.setAttribute("stroke", color);
             rect.setAttribute("stroke-width", "1.5");
             group.appendChild(rect);
@@ -584,7 +574,7 @@ function drawLinksAndNodes(svg, node, bestMove) {
             const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
             // Coordinate diamonds
             polygon.setAttribute("points", `${n.x},${n.y-12} ${n.x+12},${n.y} ${n.x},${n.y+12} ${n.x-12},${n.y}`);
-            polygon.setAttribute("fill", "#1a162a");
+            polygon.setAttribute("fill", "#ffffff");
             polygon.setAttribute("stroke", color);
             polygon.setAttribute("stroke-width", "2");
             group.appendChild(polygon);
@@ -593,8 +583,8 @@ function drawLinksAndNodes(svg, node, bestMove) {
             circ.setAttribute("cx", n.x);
             circ.setAttribute("cy", n.y);
             circ.setAttribute("r", 9);
-            circ.setAttribute("fill", "#111");
-            circ.setAttribute("stroke", "#ff453a");
+            circ.setAttribute("fill", "#f5f5f7");
+            circ.setAttribute("stroke", "var(--color-red)");
             circ.setAttribute("stroke-width", "1.5");
             circ.setAttribute("stroke-dasharray", "3,3");
             group.appendChild(circ);
@@ -604,7 +594,7 @@ function drawLinksAndNodes(svg, node, bestMove) {
             circ.setAttribute("cx", n.x);
             circ.setAttribute("cy", n.y);
             circ.setAttribute("r", 9);
-            circ.setAttribute("fill", "#1a162a");
+            circ.setAttribute("fill", "#ffffff");
             circ.setAttribute("stroke", color);
             circ.setAttribute("stroke-width", "2");
             group.appendChild(circ);
@@ -675,8 +665,8 @@ function initCharts() {
             datasets: [{
                 label: 'Mean TD Temporal Error',
                 data: [],
-                borderColor: '#0a84ff',
-                backgroundColor: 'rgba(10, 132, 255, 0.1)',
+                borderColor: '#0071e3',
+                backgroundColor: 'rgba(0, 113, 227, 0.05)',
                 borderWidth: 2,
                 fill: true,
                 tension: 0.3
@@ -686,8 +676,8 @@ function initCharts() {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#86868b' } },
-                y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#86868b' } }
+                x: { grid: { color: '#e5e5e7' }, ticks: { color: '#86868b' } },
+                y: { grid: { color: '#e5e5e7' }, ticks: { color: '#86868b' } }
             },
             plugins: { legend: { display: false } }
         }
@@ -702,7 +692,7 @@ function initCharts() {
                 {
                     label: 'Best Champion Fitness',
                     data: [],
-                    borderColor: '#30d158',
+                    borderColor: '#34c759',
                     borderWidth: 2,
                     fill: false,
                     tension: 0.2
@@ -710,7 +700,7 @@ function initCharts() {
                 {
                     label: 'Average Fitness',
                     data: [],
-                    borderColor: '#ff9f0a',
+                    borderColor: '#ff9500',
                     borderWidth: 1.5,
                     borderDash: [5, 5],
                     fill: false,
@@ -722,10 +712,10 @@ function initCharts() {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#86868b' } },
-                y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#86868b' } }
+                x: { grid: { color: '#e5e5e7' }, ticks: { color: '#86868b' } },
+                y: { grid: { color: '#e5e5e7' }, ticks: { color: '#86868b' } }
             },
-            plugins: { legend: { labels: { color: '#f5f5f7' } } }
+            plugins: { legend: { labels: { color: '#1d1d1f' } } }
         }
     });
 }
